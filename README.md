@@ -5,6 +5,7 @@ About A playground project for testing new features introduced to the C++ standa
 ## Features
 
 * C++ modules (C++20)
+* Lockpick toy example.
 
 ## Resources
 

@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
-project(cpp23_modules CXX)
+project(Cpp23_Modules CXX)
 
 # turning off extensions avoids an issue with the clang 16 compiler
 # clang 17 and greater can avoid this setting
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# oet the version of C++ for the project
 set(CMAKE_CXX_STANDARD 23)
 
 if(MSVC)

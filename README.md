@@ -1,11 +1,11 @@
 # C++23 Playground
 
-About A playground project for testing new features introduced to the C++ standard.
+A playground project for testing new features introduced to the C++ standard.
 
 ## Features
 
-* C++ modules (MSVC, C++23)
-* Lockpick toy example.
+* C++ Modules example (MSVC, C++23)
+* Lock-pick Toy example.
 
 ## Resources
 

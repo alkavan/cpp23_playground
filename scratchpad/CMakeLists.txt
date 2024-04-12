@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.28)
-project(Lockpick CXX)
+project(ScratchPad CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(three_number_lockpick
+# Create an executable
+add_executable(scratchpad
         main.cpp
 )

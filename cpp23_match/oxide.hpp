@@ -13,18 +13,19 @@ namespace oxide {
 
     // Optional type
     template<typename T>
-    constexpr Option<T> Some(T&& value) {
+    constexpr Option<std::decay_t<T>> Some(T&& value) {
         return std::make_optional(std::forward<T>(value));
     }
 
     constexpr std::nullopt_t None = std::nullopt;
 
+    // Vector type
     template<typename T>
     using Vec = std::vector<T>;
 
-    // Template for defining a Rust-like enum as a variant of user-provided variant structs.
+    // Union type (like enum)
     template <typename... Variants>
-    using Enum = std::variant<Variants...>;
+    using Union = std::variant<Variants...>;
 
     // For pattern matching (from your previous setup, adapted for exhaustiveness)
     template <class... Handlers>
@@ -50,6 +51,6 @@ namespace oxide {
 }
 
 // Macro-based match syntax for a more Rust-like feel (inspired by common emulations)
-#define do_match std::visit([](auto&&... args) { return oxide::overloaded{std::forward<decltype(args)>(args)...}; }
-#define match_case(param) [](param)
-#define match_value(value) , std::forward<decltype(value)>(value))
+#define ox_match std::visit([](auto&&... args) { return oxide::overloaded{std::forward<decltype(args)>(args)...}; }
+#define ox_match_case(param) [](param)
+#define ox_match_value(value) , std::forward<decltype(value)>(value))

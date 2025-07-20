@@ -1,48 +1,59 @@
 cmake_minimum_required(VERSION 3.28)
-project(Cpp23_Modules CXX)
+project(CppModules CXX)
 
-# turning off extensions avoids an issue with the clang 16 compiler
-# clang 17 and greater can avoid this setting
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 23) # Use 23 for /std:c++latest; alternatively, set to 20
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) # Disable compiler-specific extensions
 
-set(CMAKE_CXX_STANDARD 23)
-
-if(MSVC)
-    add_compile_options("/experimental:module")
+# Find the Visual Studio toolset's module directory
+# VCToolsInstallDir is typically set by the Visual Studio environment
+if(DEFINED ENV{VCToolsInstallDir})
+    set(VCTOOLS_DIR "$ENV{VCToolsInstallDir}")
 else()
-    # other compiler options
+    message(FATAL_ERROR "VCToolsInstallDir environment variable not found. Ensure Visual Studio environment is set up.")
 endif()
 
-# you don't want to hardcode the path here in a real-world project, but you get the idea...
-set(MSVC_MODULE_PATH "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.39.33519/modules/")
+# Path to std.ixx
+set(STD_MODULE_SOURCE "${VCTOOLS_DIR}/modules/std.ixx")
 
-# Not sure suddenly this does not copy?
+# Check if the module file exists
+if(NOT EXISTS "${STD_MODULE_SOURCE}")
+    message(FATAL_ERROR "std.ixx not found at ${STD_MODULE_SOURCE}")
+endif()
 
-#file(COPY
-#        "${MSVC_MODULE_PATH}/std.ixx"
-#        DESTINATION
-#        ${PROJECT_SOURCE_DIR}
-#)
+# Add a custom target to compile std.ixx into an object file
+add_custom_command(
+        OUTPUT std.obj
+        COMMAND ${CMAKE_CXX_COMPILER} /std:c++latest /EHsc /nologo /W4 /c "${STD_MODULE_SOURCE}"
+        DEPENDS "${STD_MODULE_SOURCE}"
+        COMMENT "Compiling C++ standard library module std.ixx"
+        VERBATIM
+)
 
-# Create a library
-add_library(module_lib1)
+# Create a static library from std.obj
+add_library(std_module STATIC)
+target_sources(std_module PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/std.obj")
+set_target_properties(std_module PROPERTIES
+        LINKER_LANGUAGE CXX
+        CXX_STANDARD 23
+        CXX_STANDARD_REQUIRED ON
+)
 
-# Add the module file to the library
-target_sources(module_lib1
-        PUBLIC
-        FILE_SET CXX_MODULES FILES
-        std.ixx
+add_executable(std_module_example main.cpp hello.ixx)
+
+target_sources(std_module_example
+        PRIVATE
+        main.cpp
+        PRIVATE
+        FILE_SET CXX_MODULES
+        TYPE CXX_MODULES
+        FILES
         hello.ixx
         scopes.ixx
 )
 
-# Create an executable
-add_executable(modules_example main.cpp)
+# Link against std_module library
+target_link_libraries(std_module_example PRIVATE std_module)
 
-# Link to the library modules
-target_link_libraries(modules_example module_lib1)
-
-if(MSVC)
-    target_compile_options(modules_example PUBLIC "/Zi")
-    target_link_options(modules_example PUBLIC "/INCREMENTAL")
-endif()
+# Specify module-specific compiler flags
+target_compile_options(std_module_example PRIVATE /std:c++latest /experimental:module /EHsc /W4)

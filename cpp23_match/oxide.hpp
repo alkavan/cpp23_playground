@@ -1,5 +1,3 @@
-#pragma once
-
 /*
     Copyright (C) 2025 Igal Alkon <igal@alkontek.com> and contributors
 
@@ -21,6 +19,9 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 */
+
+#ifndef OXIDE_HPP
+#define OXIDE_HPP
 
 #include <variant>
 #include <string>
@@ -49,7 +50,7 @@ namespace oxide {
     template <typename... Variants>
     using Union = std::variant<Variants...>;
 
-    // For pattern matching (from your previous setup, adapted for exhaustiveness)
+    // Pattern matching template
     template <class... Handlers>
     struct match : Handlers... {
         using Handlers::operator()...;
@@ -69,10 +70,12 @@ namespace oxide {
 
     // Use C++23 std::expected for Result<T, E> (Rust-like, with built-in methods)
     template <typename T, typename E = std::string>
-    using Result = std::expected<T, E>;  // Holds T (success) or unexpected<E> (error)
+    using Result = std::expected<T, E>;
 }
 
 // Macro-based match syntax for a more Rust-like feel (inspired by common emulations)
 #define ox_match std::visit([](auto&&... args) { return oxide::overloaded{std::forward<decltype(args)>(args)...}; }
 #define ox_match_case(param) [](param)
 #define ox_match_value(value) , std::forward<decltype(value)>(value))
+
+#endif // OXIDE_HPP

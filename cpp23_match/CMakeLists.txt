@@ -3,7 +3,7 @@ project(CppMatch CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(oxide
+add_executable(cpp23_match
         main.cpp
         oxide.hpp
 )

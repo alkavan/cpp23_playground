@@ -1,5 +1,11 @@
 export module hello;
+
+#ifdef _MSC_VER
 import std.core;
+#else
+import <iostream>;
+import <string>;
+#endif
 
 class Cow {
 public:
